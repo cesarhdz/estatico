@@ -1,3 +1,37 @@
 #!/usr/bin/env node
 
-console.log('Estatico, Site Generator')
+var
+estatico = require('../index'),
+program = require('commander')
+
+
+program.version(require('../package.json').version)
+
+
+
+program
+	.command('serve [env]')
+	.description('Serves application using current dir')
+	.action(function(env, opts){
+
+		var app = new estatico.App(process.cwd(), env)
+
+		app.build()
+
+		// app.serve()
+	})
+
+
+
+/**
+ * Parse.
+ */
+program.parse(process.argv)
+
+
+
+// Shows help by default
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}
+
