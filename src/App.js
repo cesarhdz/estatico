@@ -25,7 +25,13 @@ App.prototype.log = console.log
 
 App.Convention = {
 	content: 'content',
-	destination: 'target/work'
+	destination: 'target/work',
+	port: 3000
+}
+
+
+App.prototype.getBaseUrl = function(){
+	return 'http://localhost:' + App.Convention.port
 }
 
 
@@ -94,12 +100,16 @@ App.prototype.build = function(){
 	// Bootstrap metalsmith
 	var metalsmith = new App.Metalsmith(this.getBaseDir())
 
-	metalsmith.destination(App.Convention.destination)
 	metalsmith.source(App.Convention.content)
+	metalsmith.destination(App.Convention.destination)
 
 
-	// Add plugins before templates
+	// Add plugins before templates	
+	var markdown = require('metalsmith-markdown')
 
+	metalsmith.use(markdown())
+
+-
 
 	// Apply templates
 	
@@ -124,13 +134,22 @@ App.prototype.build = function(){
 }
 
 
+
 /**
  * Serve files
  */
 App.prototype.serve = function(){
 
-	this.log('serving')
+	var express = require('express')
+	var serveStatic = require('serve-static')
 
+	var server = express()
+
+	server.use(serveStatic(this.dir('destination'), {
+		'index': ['default.html', 'default.htm']
+	}))
+
+	server.listen(App.Convention.port)
 }
 
 

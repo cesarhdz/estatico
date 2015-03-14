@@ -3,10 +3,43 @@
 var
 estatico = require('../index'),
 program = require('commander'),
-chalk = require('chalk')
+chalk = require('chalk'),
+log = require('gulp-util').log
 
 
 program.version(require('../package.json').version)
+
+
+/**
+ * Shortcut to create an App, and log proccess
+ * @return {App} 
+ */
+function newApp(env){
+
+	var app = new estatico.App(process.cwd(), env)
+
+	log('Starting app in ' + process.cwd())
+
+	return app
+}
+
+/**
+ * Build app + log proccess
+ * @param  {App} app application to build
+ * @return {Promise}     promise taht will be resolved when site is built
+ */
+function build(app){
+
+	log('Building site...')
+
+	var promise = app.build()
+
+	promise.then(function(){
+		log('Site successfully built to ' + chalk.green(app.dir('destination')))
+	})
+
+	return promise
+}
 
 
 
@@ -15,22 +48,26 @@ program
 	.description('Serves application using current dir')
 	.action(function(env, opts){
 
-		var app = new estatico.App(process.cwd(), env)
+		var app = newApp(env)
+
+		build(app).then(function(){
+			app.serve()
+
+			log('Site running at ' + chalk.green(app.getBaseUrl()))
+			log('Press Ctrl + C to stop')
+		})
+
+	})
 
 
-		console.log('Building site...')
+program
+	.command('build [env]')
+	.description('Build application')
+	.action(function(env, opts){
 
-		app.build()
-			.then(function(){ 
+		var app = newApp(env)
 
-				console.log('Site successfully built to ' + chalk.green(app.dir('destination')))
-
-				app.serve()
-				
-				console.log('Site running at ' + chalk.green('url'))
-			})
-
-		// app.serve()
+		build(app)
 	})
 
 
