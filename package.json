@@ -1,0 +1,15 @@
+{
+  "name": "estatico",
+  "version": "0.1.0",
+  "description": "Static site generator based on Metalsmith",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --ui bdd spec/"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^2.1.1",
+    "mocha": "^2.2.1"
+  }
+}
