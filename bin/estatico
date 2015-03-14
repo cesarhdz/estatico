@@ -2,7 +2,8 @@
 
 var
 estatico = require('../index'),
-program = require('commander')
+program = require('commander'),
+chalk = require('chalk')
 
 
 program.version(require('../package.json').version)
@@ -16,7 +17,18 @@ program
 
 		var app = new estatico.App(process.cwd(), env)
 
+
+		console.log('Building site...')
+
 		app.build()
+			.then(function(){ 
+
+				console.log('Site successfully built to ' + chalk.green(app.dir('destination')))
+
+				app.serve()
+				
+				console.log('Site running at ' + chalk.green('url'))
+			})
 
 		// app.serve()
 	})

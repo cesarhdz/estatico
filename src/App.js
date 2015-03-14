@@ -1,5 +1,6 @@
 var
-path = require('path')
+path = require('path'),
+Promise = require('node-promise').Promise
 
 
 function App(baseDir, env){
@@ -73,32 +74,53 @@ App.prototype.dir = function(file){
 
 /**
  * Build app using middleware
- * 
- * @return {void}
+ *
+ * @throws {Error} If current working dir is not valid
+ * @return {Promise} 
  */
 App.prototype.build = function(){
 
+	// Validate working dir
 	var 
 	self = this,
+	promise = new Promise()
 	validation = this.validateBaseDir()
 
 	if(!validation.valid){
-		console.warn(validation.errors.join('\n'))
+		this.log(validation.errors.join('\n'))
 		throw new Error('Working dir is not valid')
 	}
 
+	// Bootstrap metalsmith
 	var metalsmith = new App.Metalsmith(this.getBaseDir())
 
-	metalsmith.source(App.Convention.content)
 	metalsmith.destination(App.Convention.destination)
+	metalsmith.source(App.Convention.content)
 
-	//@TODO Load plugins
+
+	// Add plugins before templates
+
+
+	// Apply templates
+	
+
+	// Plugins after templates
+	
+
 
 	metalsmith.build(function(err){
-	  if (err) return fatal(err.message, err.stack);
-	  self.log('successfully built to ' + metalsmith.destination());
+	  if (err){
+	  	self.log(err.message, err.stack);
+	  	promise.reject(err)
+	  }
+
+	  else{
+	  	promise.resolve()
+	  }
 	})
 
+
+	return promise
 }
 
 
