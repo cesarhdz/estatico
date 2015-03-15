@@ -1,7 +1,7 @@
 extend layout
 
 block head
-  title= filename
+  title #{filename} &laquo; #{site.name}
 
 block content
   main!= page.contents

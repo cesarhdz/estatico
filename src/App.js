@@ -1,7 +1,8 @@
 var
 path = require('path'),
 Promise = require('node-promise').Promise,
-Theme = require('./Theme')
+Theme = require('./Theme'),
+Site = require('./Site')
 
 
 function App(baseDir, env){
@@ -12,14 +13,6 @@ function App(baseDir, env){
 	this.getEnv = function(){
 		return env || App.DEFAULT_ENVIRONMENT
 	}
-
-	// Check is a valid app
-	var validation = this.validateBaseDir()
-
-	if(!validation.valid){
-		this.log(validation.errors.join('\n'))
-		throw new Error('Working dir is not valid')
-	}
 }
 
 
@@ -27,66 +20,9 @@ App.DEFAULT_ENVIRONMENT = 'dev'
 
 // Dependencies can be mocked
 App.prototype.generatorService = new (require('./GeneratorService'))
-App.prototype.configService = new (require('./ConfigService'))
 
 App.prototype.fs = require('fs')
 App.prototype.log = console.log
-
-
-App.Convention = {
-	content: 'content',
-	destination: 'target/work',
-
-	port: 3000
-}
-
-
-App.prototype.getBaseUrl = function(){
-	return 'http://localhost:' + App.Convention.port
-}
-
-
-/**
- * Validate working dirs has required dirs
- * 		
- * @return {Object} Validation object
- * @param {Boolean} [valid] Whether dir is valid or not
- * @param {Array} [errors] Errors found in validation
- */
-App.prototype.validateBaseDir = function(){
-
-	var 
-	self = this,
-
-	// Content and destination folder must exists
-	errors = ['content'].reduce(function(e, key){
-
-		var dir = self.dir(key)
-
-		if(! self.fs.existsSync(dir)){
-			e.push('['+ key +'] dir is missing, it must be located at [' + App.Convention[key] + ']') 
-		}
-
-		return e
-
-	}, [])
-
-
-	return {
-		valid: errors.length === 0,
-		errors: errors 
-	}
-}
-
-/**
- * Return full qualified dir
- * 
- * @param  {String} file 
- * @return {String}      path
- */
-App.prototype.dir = function(file){
-	return path.join(this.getBaseDir(), App.Convention[file])
-}
 
 
 /**
@@ -102,25 +38,27 @@ App.prototype.build = function(){
 	self = this,
 	promise = new Promise(),
 
-	config = this.configService.load(this.getBaseDir(), this.getEnv()),
-	theme = Theme.resolve(this.getBaseDir(), config.theme),
+
+	site = new Site(this.getBaseDir(), this.getEnv()),
+
+	theme = Theme.resolve(this.getBaseDir(), site.config.theme),
 
 	generator = this.generatorService.create({
-		cwd: this.getBaseDir(),
-		source: App.Convention.content,
-		destination: App.Convention.destination
+		cwd: site.dir,
+		source: Site.Convention.content,
+		destination: Site.Convention.destination
 	})
 
 
 	// Add generators
-	this.generatorService.addParser(generator, config)
+	this.generatorService.addParser(generator, site)
 
 	// @TODO this.generatorService.addPlugins(generator, config)
-
+	
 	/**
 	 * Add generator to selected theme
 	 */
-	theme.bind(generator, config)
+	theme.bind(generator, site)
 
 	// this.generatorService.addPlugins(generator, config)
 
@@ -131,7 +69,7 @@ App.prototype.build = function(){
 	  }
 
 	  else{
-	  	promise.resolve()
+	  	promise.resolve(site, theme)
 	  }
 	})
 
@@ -144,18 +82,18 @@ App.prototype.build = function(){
 /**
  * Serve files
  */
-App.prototype.serve = function(){
+App.prototype.serve = function(site){
 
 	var express = require('express')
 	var serveStatic = require('serve-static')
 
 	var server = express()
 
-	server.use(serveStatic(this.dir('destination'), {
+	server.use(serveStatic(site.destinationDir, {
 		'index': ['default.html', 'default.htm']
 	}))
 
-	server.listen(App.Convention.port)
+	server.listen(Site.Convention.port)
 }
 
 

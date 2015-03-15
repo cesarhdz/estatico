@@ -34,8 +34,8 @@ function build(app){
 
 	var promise = app.build()
 
-	promise.then(function(){
-		log('Site successfully built to ' + chalk.green(app.dir('destination')))
+	promise.then(function(site, theme){
+		log('Site successfully built to ' + chalk.green(site.destinationDir))
 	})
 
 	return promise
@@ -50,10 +50,10 @@ program
 
 		var app = newApp(env)
 
-		build(app).then(function(){
-			app.serve()
+		build(app).then(function(site, theme){
+			app.serve(site)
 
-			log('Site running at ' + chalk.green(app.getBaseUrl()))
+			log('Site running at ' + chalk.green(site.url))
 			log('Press Ctrl + C to stop')
 		})
 

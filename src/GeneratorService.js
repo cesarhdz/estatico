@@ -32,7 +32,7 @@ GeneratorService.prototype.addPlugins = function(generator, config){
  * @param {Object} config    
  */
 GeneratorService.prototype.addParser = function(generator, config){
-	generator.use(markdown(config))
+	generator.use(markdown())
 }
 
 

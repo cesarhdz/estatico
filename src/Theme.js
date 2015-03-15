@@ -15,6 +15,8 @@ function Theme(dir){
 	this.baseDir = dir
 	this.viewsDir = path.join(dir, convention.views)
 	this.assetsDir = path.join(dir, convention.assets)
+
+	this.locals = []
 }
 
 
@@ -78,7 +80,7 @@ Theme.prototype.validate = function(){
  * @param  {Metalsmith} generator Current generator
  * @return {void}           
  */
-Theme.prototype.bind = function(generator, locals){
+Theme.prototype.bind = function(generator, site){
 
 
 	var self = this
@@ -88,7 +90,7 @@ Theme.prototype.bind = function(generator, locals){
 		Object.keys(files).forEach(function(k){
 			// If its supported, then its parsed
 			if(self.isFileSupported(k, files[k])){
-				files[k].contents = new Buffer(self.parseFile(k, files[k]), locals)
+				files[k].contents = new Buffer(self.parseFile(k, files[k], site))
 			}
 		})
 
@@ -109,20 +111,21 @@ Theme.prototype.isFileSupported = function(name, file){
 
 
 
-Theme.prototype.parseFile = function(name, file, locals){
+Theme.prototype.parseFile = function(name, file, site){
 	var 
 	template = this.findTemplate(name, file),
-	model = this.buildViewModel(name, file, locals)
+	model = this.buildViewModel(name, file, site)
 
 	return this.engine.renderFile(template, model)
 }
 
-Theme.prototype.buildViewModel = function(filename, file, locals){
+Theme.prototype.buildViewModel = function(filename, file, site){
 
-	var model = extend({}, locals)
+	var model = extend({}, this.locals)
 
 	model.filename = filename
 	model.page = file //@TODO enchande file?
+	model.site = site
 
 	return model
 }

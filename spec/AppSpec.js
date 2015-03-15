@@ -8,6 +8,10 @@ describe('App', function(){
 
 	var app
 
+	beforeEach(function(){
+		app = new estatico.App()
+	})
+
 
 	describe('#constructor', function(){
 		
@@ -28,6 +32,16 @@ describe('App', function(){
 			app.getEnv().should.equal('prod')
 		})
 
+
+	})
+
+
+
+	describe('#build', function(){
+
+		it('Should build source dir', function(){
+			app.build()
+		})
 
 	})
 

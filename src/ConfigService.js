@@ -22,7 +22,7 @@ ConfigService.prototype.load = function(dir, env){
 	// Check file exists
 	var file = path.join(dir, 'config.yml')
 
-	return (fs.existsSync(file)) ? this.parseFile(file) : {}
+	return (fs.existsSync(file)) ? (this.parseFile(file) || {}) : {}
 
 }
 
