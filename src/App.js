@@ -17,7 +17,8 @@ function App(baseDir, env){
 App.DEFAULT_ENVIRONMENT = 'dev'
 
 // Dependencies can be mocked
-App.Metalsmith = require('metalsmith')
+App.prototype.generatorService = new (require('./GeneratorService'))
+App.prototype.configService = new (require('./ConfigService'))
 
 App.prototype.fs = require('fs')
 App.prototype.log = console.log
@@ -26,6 +27,10 @@ App.prototype.log = console.log
 App.Convention = {
 	content: 'content',
 	destination: 'target/work',
+
+	templateDir: 'views',
+	templateEngine: 'jade',
+
 	port: 3000
 }
 
@@ -87,10 +92,7 @@ App.prototype.dir = function(file){
 App.prototype.build = function(){
 
 	// Validate working dir
-	var 
-	self = this,
-	promise = new Promise()
-	validation = this.validateBaseDir()
+	var validation = this.validateBaseDir()
 
 	if(!validation.valid){
 		this.log(validation.errors.join('\n'))
@@ -98,27 +100,31 @@ App.prototype.build = function(){
 	}
 
 	// Bootstrap metalsmith
-	var metalsmith = new App.Metalsmith(this.getBaseDir())
+	var 
+	self = this,
+	promise = new Promise(),
+	config = this.configService.load(this.getBaseDir(), this.getEnv()),
 
-	metalsmith.source(App.Convention.content)
-	metalsmith.destination(App.Convention.destination)
-
-
-	// Add plugins before templates	
-	var markdown = require('metalsmith-markdown')
-
-	metalsmith.use(markdown())
-
--
-
-	// Apply templates
-	
-
-	// Plugins after templates
-	
+	generator = this.generatorService.create({
+		cwd: this.getBaseDir(),
+		source: App.Convention.content,
+		destination: App.Convention.destination
+	})
 
 
-	metalsmith.build(function(err){
+	// Add generators
+	this.generatorService.addParser(generator, config)
+
+	// this.generatorService.addPlugins(generator, config)
+
+	this.generatorService.addTheme(generator, {
+		dir: App.Convention.templateDir,
+		engine: App.Convention.templateEngine
+	})
+
+	// this.generatorService.addPlugins(generator, config)
+
+	generator.build(function(err){
 	  if (err){
 	  	self.log(err.message, err.stack);
 	  	promise.reject(err)
