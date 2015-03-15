@@ -37,13 +37,4 @@ GeneratorService.prototype.addParser = function(generator, config){
 
 
 
-GeneratorService.prototype.addTheme = function(theme, generator, config){
-	
-	// Validate theme
-
-
-}
-
-
-
 module.exports = GeneratorService

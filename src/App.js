@@ -1,6 +1,7 @@
 var
 path = require('path'),
-Promise = require('node-promise').Promise
+Promise = require('node-promise').Promise,
+Theme = require('./Theme')
 
 
 function App(baseDir, env){
@@ -91,19 +92,16 @@ App.prototype.dir = function(file){
  */
 App.prototype.build = function(){
 
-	// Validate working dir
-	var validation = this.validateBaseDir()
 
-	if(!validation.valid){
-		this.log(validation.errors.join('\n'))
-		throw new Error('Working dir is not valid')
-	}
 
 	// Bootstrap metalsmith
 	var 
 	self = this,
+	validation = this.validateBaseDir(),
 	promise = new Promise(),
 	config = this.configService.load(this.getBaseDir(), this.getEnv()),
+
+	theme = Theme.resolve(this.getBaseDir(), config.theme),
 
 	generator = this.generatorService.create({
 		cwd: this.getBaseDir(),
@@ -111,16 +109,30 @@ App.prototype.build = function(){
 		destination: App.Convention.destination
 	})
 
+	// Validate working dir
+	if(!validation.valid){
+		this.log(validation.errors.join('\n'))
+		throw new Error('Working dir is not valid')
+	}
+
+
+	// Validate theme
+	if(! theme.validate()){
+		this.log(theme.errors.join('n'))
+		throw new Error('Theme is invalid')
+	}
+
+
 
 	// Add generators
 	this.generatorService.addParser(generator, config)
 
-	// this.generatorService.addPlugins(generator, config)
+	// @TODO this.generatorService.addPlugins(generator, config)
 
-	this.generatorService.addTheme(generator, {
-		dir: App.Convention.templateDir,
-		engine: App.Convention.templateEngine
-	})
+	/**
+	 * Add generator to selected theme
+	 */
+	theme.bind(generator)
 
 	// this.generatorService.addPlugins(generator, config)
 
