@@ -2,6 +2,10 @@ extend layout
 
 block head
   title #{filename} &laquo; #{site.name}
+  link(href='/assets/css/style.css', rel='stylesheet')
 
 block content
-  main!= page.contents
+
+  h1 #{page.title}
+
+  .content!= page.contents

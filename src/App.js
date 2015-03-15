@@ -69,7 +69,8 @@ App.prototype.build = function(){
 	  }
 
 	  else{
-	  	promise.resolve(site, theme)
+	  	site.theme = theme
+	  	promise.resolve(site)
 	  }
 	})
 
@@ -89,9 +90,10 @@ App.prototype.serve = function(site){
 
 	var server = express()
 
-	server.use(serveStatic(site.destinationDir, {
-		'index': ['default.html', 'default.htm']
-	}))
+	server.use(serveStatic(site.destinationDir, {'index': ['index.html']}))
+	server.use('/assets/', serveStatic(site.theme.assetsDir))
+
+	// Add not found
 
 	server.listen(Site.Convention.port)
 }

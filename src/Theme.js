@@ -124,7 +124,10 @@ Theme.prototype.buildViewModel = function(filename, file, site){
 	var model = extend({}, this.locals)
 
 	model.filename = filename
-	model.page = file //@TODO enchande file?
+	model.page = file
+
+	model.page.title = filename  //@TODO enchande file?
+	
 	model.site = site
 
 	return model
