@@ -12,6 +12,14 @@ function App(baseDir, env){
 	this.getEnv = function(){
 		return env || App.DEFAULT_ENVIRONMENT
 	}
+
+	// Check is a valid app
+	var validation = this.validateBaseDir()
+
+	if(!validation.valid){
+		this.log(validation.errors.join('\n'))
+		throw new Error('Working dir is not valid')
+	}
 }
 
 
@@ -28,9 +36,6 @@ App.prototype.log = console.log
 App.Convention = {
 	content: 'content',
 	destination: 'target/work',
-
-	templateDir: 'views',
-	templateEngine: 'jade',
 
 	port: 3000
 }
@@ -92,15 +97,12 @@ App.prototype.dir = function(file){
  */
 App.prototype.build = function(){
 
-
-
 	// Bootstrap metalsmith
 	var 
 	self = this,
-	validation = this.validateBaseDir(),
 	promise = new Promise(),
-	config = this.configService.load(this.getBaseDir(), this.getEnv()),
 
+	config = this.configService.load(this.getBaseDir(), this.getEnv()),
 	theme = Theme.resolve(this.getBaseDir(), config.theme),
 
 	generator = this.generatorService.create({
@@ -108,20 +110,6 @@ App.prototype.build = function(){
 		source: App.Convention.content,
 		destination: App.Convention.destination
 	})
-
-	// Validate working dir
-	if(!validation.valid){
-		this.log(validation.errors.join('\n'))
-		throw new Error('Working dir is not valid')
-	}
-
-
-	// Validate theme
-	if(! theme.validate()){
-		this.log(theme.errors.join('n'))
-		throw new Error('Theme is invalid')
-	}
-
 
 
 	// Add generators
@@ -132,7 +120,7 @@ App.prototype.build = function(){
 	/**
 	 * Add generator to selected theme
 	 */
-	theme.bind(generator)
+	theme.bind(generator, config)
 
 	// this.generatorService.addPlugins(generator, config)
 
