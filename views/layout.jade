@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 html(lang="en")
 head
-	block head
-	link(href='/assets/css/style.css', rel='stylesheet')
-	meta(charset="UTF-8")
+  block head
+  link(href='/assets/css/style.css', rel='stylesheet')
+  meta(charset="UTF-8")
 
 body
 
-	main
-		block content
-	
-	footer &copy; #{site.name}. Built with Estatico Site Generator
+  nav
+    ul
+      each link, label in {home: '', blog: 'blog/'}
+        li
+          a(href=site.url + '/' + link)= label
+
+
+  main
+    block content
+  
+  footer &copy; #{site.name}. Built with Estatico Site Generator
