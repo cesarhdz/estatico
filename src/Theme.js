@@ -87,8 +87,6 @@ Theme.prototype.bind = function(generator, site){
 
 	this.locals = this.loadHelpers(site)
 
-	console.log(this.locals)
-
 	generator.use(function(files, metal, next){
 		// Only html files will be parsed
 		Object.keys(files).forEach(function(k){

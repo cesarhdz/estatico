@@ -4,7 +4,9 @@ var
 estatico = require('../index'),
 program = require('commander'),
 chalk = require('chalk'),
-log = require('gulp-util').log
+log = require('gulp-util').log,
+watch = require('chokidar').watch,
+path = require('path')
 
 
 program.version(require('../package.json').version)
@@ -42,6 +44,21 @@ function build(app){
 }
 
 
+function reload(app, event){
+	return function(file){
+
+		var 
+		pattern = path.join(app.getBaseDir(), 'content/'),
+		rel = path.relative(pattern, file)
+
+		console.log('\n')
+		log('File [' + chalk.cyan(rel) + '] ' + event +'.' )
+		
+		build(app)
+	}
+}
+
+
 
 program
 	.command('serve [env]')
@@ -55,7 +72,22 @@ program
 
 			log('Site running at ' + chalk.green(site.url))
 			log('Press Ctrl + C to stop')
+
+
+			// Watch filechanges
+			var 
+			pattern = path.join(app.getBaseDir(), 'content/'),
+			opts = {ignoreInitial:  true}
+
+			log('Watching ' + chalk.cyan(pattern) + '...')
+
+			watch(pattern, opts).on('change', reload(app, 'updated'))
+			watch(pattern, opts).on('add', reload(app, 'added'))
+			watch(pattern, opts).on('unlink', reload(app, 'deleted'))
 		})
+
+
+
 
 	})
 
