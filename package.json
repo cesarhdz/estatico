@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "chalk": "^1.0.0",
+    "chokidar": "^1.0.0-rc4",
     "commander": "^2.7.1",
     "express": "^4.12.2",
     "gulp-util": "^3.0.4",
