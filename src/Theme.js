@@ -85,12 +85,12 @@ Theme.prototype.bind = function(generator, site){
 
 	var self = this
 
-	generator.use(function(files, mt, next){
+	generator.use(function(files, metal, next){
 		// Only html files will be parsed
 		Object.keys(files).forEach(function(k){
 			// If its supported, then its parsed
 			if(self.isFileSupported(k, files[k])){
-				files[k].contents = new Buffer(self.parseFile(k, files[k], site))
+				files[k].contents = new Buffer(self.parseFile(k, files[k], site, metal))
 			}
 		})
 
@@ -111,32 +111,41 @@ Theme.prototype.isFileSupported = function(name, file){
 
 
 
-Theme.prototype.parseFile = function(name, file, site){
+Theme.prototype.parseFile = function(name, file, site, metal){
 	var 
-	template = this.findTemplate(name, file),
-	model = this.buildViewModel(name, file, site)
+	template = this.findTemplate(file),
+	model = this.buildViewModel(name, file, site, metal)
 
 	return this.engine.renderFile(template, model)
 }
 
-Theme.prototype.buildViewModel = function(filename, file, site){
+Theme.prototype.buildViewModel = function(filename, file, site, metal){
 
 	var model = extend({}, this.locals)
 
 	model.filename = filename
 	model.page = file
-
-	model.page.title = filename  //@TODO enchande file?
-	
 	model.site = site
+	model.meta = metal._metadata
+
+	console.log(model)
 
 	return model
 }
 
-Theme.prototype.findTemplate = function(name, file){
-	//@TODO resolve template
+Theme.prototype.findTemplate = function(file){
+	
+	var 
+	DEFAULT_TEMPLATE = 'default',
+	template = file.template
 
-	return path.join(this.viewsDir, 'index' + convention.viewExtension)
+	if(! template){
+		var collection = file.collection[0] || ''
+
+		template = path.join(collection, DEFAULT_TEMPLATE)
+	}
+
+	return path.join(this.viewsDir, template + convention.viewExtension)
 }
 
 
