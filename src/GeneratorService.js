@@ -40,9 +40,12 @@ GeneratorService.prototype.addParser = function(generator, site){
 
 	var self = this
 
+	// Permalinks gioes here, before adding slug, uri 
+
 	generator.use(function(files, metal, next){
 		Object.keys(files).forEach(function(page){
 			// {collection}/{name}.{ext}
+			files[page].uri = self.getUri(page)
 			files[page].slug = self.getSlug(page)
 			files[page].collection = self.getCollection(page, files[page].slug)
 		})
@@ -52,7 +55,6 @@ GeneratorService.prototype.addParser = function(generator, site){
 	generator.use(collections(site.config.collections))
 	generator.use(markdown())
 }
-
 
 GeneratorService.prototype.getSlug = function(file){
 	var base = path.basename(file),
@@ -70,6 +72,11 @@ GeneratorService.prototype.getCollection = function(file, uri){
 	if(parts.length > 1 && uri !== 'index'){
 	 	return parts[0]
 	}
+}
+
+
+GeneratorService.prototype.getUri = function(file){
+	return file.split('.')[0] + '.html'
 }
 
 

@@ -93,7 +93,7 @@ App.prototype.serve = function(site){
 	server.use(serveStatic(site.destinationDir, {'index': ['index.html']}))
 	server.use('/assets/', serveStatic(site.theme.assetsDir))
 
-	// Add not found
+	//@TODO Add not found
 
 	server.listen(Site.Convention.port)
 }

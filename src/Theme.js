@@ -85,6 +85,10 @@ Theme.prototype.bind = function(generator, site){
 
 	var self = this
 
+	this.locals = this.loadHelpers(site)
+
+	console.log(this.locals)
+
 	generator.use(function(files, metal, next){
 		// Only html files will be parsed
 		Object.keys(files).forEach(function(k){
@@ -128,8 +132,6 @@ Theme.prototype.buildViewModel = function(filename, file, site, metal){
 	model.site = site
 	model.meta = metal._metadata
 
-	console.log(model)
-
 	return model
 }
 
@@ -146,6 +148,28 @@ Theme.prototype.findTemplate = function(file){
 	}
 
 	return path.join(this.viewsDir, template + convention.viewExtension)
+}
+
+
+/**
+ * Load helpers
+ * @param  {[type]} site [description]
+ * @return {[type]}      [description]
+ */
+Theme.prototype.loadHelpers = function(site){
+
+	var helpers = {
+		permalink: '../helpers/permalink'
+	}
+
+	return Object.keys(helpers).reduce(function(map, key){
+
+		map[key] = require(helpers[key])(site)
+
+		return map
+
+	}, [])
+
 }
 
 
