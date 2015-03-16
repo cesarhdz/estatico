@@ -1,0 +1,17 @@
+extend ../layout
+
+block head
+  title #{page.title} &laquo; #{site.name}
+  
+
+block content
+
+  h1= page.title
+
+  div!= page.contents
+
+
+  each post, index in meta.blog
+    article
+      h2= post.title
+      p!= post.contents

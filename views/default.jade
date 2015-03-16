@@ -1,0 +1,10 @@
+extend layout
+
+block head
+  title #{page.title || filename } &laquo; #{site.name}
+
+block content
+
+  h1 #{page.title}
+
+  .content!= page.contents
