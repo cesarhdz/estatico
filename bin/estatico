@@ -34,9 +34,11 @@ function build(app){
 
 	log('Building site...')
 
-	var promise = app.build()
+	var 
+	site = app.bootstrap(),
+	promise = app.build(site)
 
-	promise.then(function(site, theme){
+	promise.then(function(){
 		log('Site successfully built to ' + chalk.green(site.destinationDir))
 	})
 

@@ -2,6 +2,8 @@ var
 path = require('path'),
 Promise = require('node-promise').Promise,
 Theme = require('./Theme'),
+Parser = require('./Parser'),
+Generator = require('./Generator'),
 Site = require('./Site')
 
 
@@ -19,10 +21,35 @@ function App(baseDir, env){
 App.DEFAULT_ENVIRONMENT = 'dev'
 
 // Dependencies can be mocked
-App.prototype.generatorService = new (require('./GeneratorService'))
+App.prototype.generator = new Generator
 
 App.prototype.fs = require('fs')
 App.prototype.log = console.log
+
+
+
+/**
+ * Bootstrap
+ * @return {Site} A site ready to be built
+ */
+App.prototype.bootstrap = function(){
+
+	var site = new Site(this.getBaseDir(), this.getEnv())
+
+	site.theme = Theme.resolve(this.getBaseDir(), site.config.theme)
+
+	site.parser = new Parser()
+
+	//@TODO Add plugin loader
+	site.plugins = {
+		beforeParser: [],
+		beforeTemplates: [],
+		afterTemplates: []
+	}
+
+	return site
+
+}
 
 
 /**
@@ -31,51 +58,11 @@ App.prototype.log = console.log
  * @throws {Error} If current working dir is not valid
  * @return {Promise} 
  */
-App.prototype.build = function(){
+App.prototype.build = function(site){
 
-	// Bootstrap metalsmith
-	var 
-	self = this,
-	promise = new Promise(),
+	console.log(this.generator)
 
-
-	site = new Site(this.getBaseDir(), this.getEnv()),
-
-	theme = Theme.resolve(this.getBaseDir(), site.config.theme),
-
-	generator = this.generatorService.create({
-		cwd: site.dir,
-		source: Site.Convention.content,
-		destination: Site.Convention.destination
-	})
-
-
-	// Add generators
-	this.generatorService.addParser(generator, site)
-
-	// @TODO this.generatorService.addPlugins(generator, config)
-	
-	/**
-	 * Add generator to selected theme
-	 */
-	theme.bind(generator, site)
-
-	// this.generatorService.addPlugins(generator, config)
-
-	generator.build(function(err){
-	  if (err){
-	  	self.log(err.message, err.stack);
-	  	promise.reject(err)
-	  }
-
-	  else{
-	  	site.theme = theme
-	  	promise.resolve(site)
-	  }
-	})
-
-
-	return promise
+	return this.generator.build(site, site.theme, site.parser, site.plugins)
 }
 
 
