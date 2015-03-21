@@ -29,9 +29,9 @@ Theme.prototype.engine = require(convention.engine)
  * @param  {[type]} theme [description]
  * @return {[type]}       [description]
  */
-Theme.resolve = function(cwd, theme){
+Theme.resolve = function(cwd, root){
 	var 
-	dir = (theme) ? path.join(cwd, theme) : path.join(__dirname, '../'),
+	dir = (root) ? path.join(cwd, root) : path.join(__dirname, '../'),
 	theme = new Theme(dir)
 
 	// Validate theme

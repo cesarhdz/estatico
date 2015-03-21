@@ -50,13 +50,14 @@ Validator.prototype.config = function(target, rules, failOnError){
 	
 	var errors = Object.keys(rules).reduce(function(acc, key){
 
-		var val = target[key]
+		var 
+		error,
+		val = target[key]
 		
 		// Iterate until one errors is found
 		for (var i = rules[key].length - 1; i >= 0; i--) {
 			
 			var 
-			error,
 			fn = rules[key][i],
 			isValid = fn(val)
 

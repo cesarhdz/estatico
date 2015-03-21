@@ -36,8 +36,11 @@ ConfigService.prototype.load = function(dir, env){
  * @return {[type]}      [description]
  */
 ConfigService.prototype.parseFile = function(file){
+
+	var config
+
 	try {
-	  var config = yaml.safeLoad(fs.readFileSync(file, 'utf8'));
+	  config = yaml.safeLoad(fs.readFileSync(file, 'utf8'));
 	} catch (e) {
 	  console.log(e);
 	}
