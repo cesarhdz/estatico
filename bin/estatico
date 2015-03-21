@@ -1,15 +1,12 @@
 #!/usr/bin/env node
 
 var
-estatico = require('../index'),
 program = require('commander'),
 chalk = require('chalk'),
 log = require('gulp-util').log,
-watch = require('chokidar').watch,
-path = require('path')
 
-
-program.version(require('../package.json').version)
+estatico = require('../index'),
+version = require('../package.json').version
 
 
 /**
@@ -45,23 +42,9 @@ function build(app){
 	return promise
 }
 
-
-function reload(app, event){
-	return function(file){
-
-		var 
-		pattern = path.join(app.getBaseDir(), 'content/'),
-		rel = path.relative(pattern, file)
-
-		console.log('\n')
-		log('File [' + chalk.cyan(rel) + '] ' + event +'.' )
-		
-		build(app)
-	}
-}
-
-
-
+/**
+ * Serve
+ */
 program
 	.command('serve [env]')
 	.description('Serves application using current dir')
@@ -70,30 +53,19 @@ program
 		var app = newApp(env)
 
 		build(app).then(function(site, theme){
-			app.serve(site)
+			app.server.start(site)
 
 			log('Site running at ' + chalk.green(site.url))
 			log('Press Ctrl + C to stop')
 
-
-			// Watch filechanges
-			var 
-			pattern = path.join(app.getBaseDir(), 'content/'),
-			opts = {ignoreInitial:  true}
-
-			log('Watching ' + chalk.cyan(pattern) + '...')
-
-			watch(pattern, opts).on('change', reload(app, 'updated'))
-			watch(pattern, opts).on('add', reload(app, 'added'))
-			watch(pattern, opts).on('unlink', reload(app, 'deleted'))
+			app.server.watch(app)
 		})
-
-
-
-
+	
 	})
 
-
+/**
+ * build
+ */
 program
 	.command('build [env]')
 	.description('Build application')
@@ -107,7 +79,7 @@ program
 
 
 /**
- * Parse.
+ * bootstrap
  */
 program.parse(process.argv)
 

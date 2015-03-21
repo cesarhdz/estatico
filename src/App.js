@@ -4,6 +4,7 @@ Promise = require('node-promise').Promise,
 Theme = require('./Theme'),
 Parser = require('./Parser'),
 Generator = require('./Generator'),
+Server = require('./Server'),
 Site = require('./Site')
 
 
@@ -22,6 +23,7 @@ App.DEFAULT_ENVIRONMENT = 'dev'
 
 // Dependencies can be mocked
 App.prototype.generator = new Generator
+App.prototype.server = new Server
 
 App.prototype.fs = require('fs')
 App.prototype.log = console.log
@@ -59,32 +61,8 @@ App.prototype.bootstrap = function(){
  * @return {Promise} 
  */
 App.prototype.build = function(site){
-
-	console.log(this.generator)
-
 	return this.generator.build(site, site.theme, site.parser, site.plugins)
 }
-
-
-
-/**
- * Serve files
- */
-App.prototype.serve = function(site){
-
-	var express = require('express')
-	var serveStatic = require('serve-static')
-
-	var server = express()
-
-	server.use(serveStatic(site.destinationDir, {'index': ['index.html']}))
-	server.use('/assets/', serveStatic(site.theme.assetsDir))
-
-	//@TODO Add not found
-
-	server.listen(Site.Convention.port)
-}
-
 
 
 module.exports = App
