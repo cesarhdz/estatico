@@ -7,7 +7,7 @@ path = require('path'),
 
 DEFAULT_COLLECTION = 'root'
 
-
+//@deprecated
 function GeneratorService(){}
 
 

@@ -15,7 +15,7 @@ describe('Generator', function(){
 
 	describe('#constructor', function(){
 		
-		it('Should be constructed with a dir an environment', function(){
+		it('Should be constructed with a dir and environment', function(){
 			// when
 			gen = new estatico.Generator()
 
