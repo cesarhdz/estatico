@@ -1,11 +1,11 @@
 var
 Metalsmith = require('metalsmith'),
 Promise = require('node-promise').Promise,
-path = require('path'),
+path = require('path')
 
-Site = require('./Site')
-
-function Generator(){}
+function Generator(cwd){
+	this.cwd = cwd
+}
 
 
 /**
@@ -17,15 +17,11 @@ function Generator(){}
  * @param {Array} plugins Plugins registerd
  * @return {promise}      
  */
-Generator.prototype.build = function(site, theme, parser, plugins){
+Generator.prototype.build = function(source, destination,  site, theme, parser, plugins){
 
 	var 
 	promise = new Promise,
-	metal = this.forge({
-		cwd: site.dir,
-		source: Site.Convention.content,
-		destination: Site.Convention.destination
-	})
+	metal = this.forge(source, destination)
 
 
 	this.bindPlugins(metal, plugins, 'beforeParser')
@@ -68,11 +64,11 @@ Generator.prototype.bindPlugins = function(metal, plugins, stage){
 }
 
 
-Generator.prototype.forge = function(config){
-	var metalsmith = new Metalsmith(config.cwd)
+Generator.prototype.forge = function(source, destination){
+	var metalsmith = new Metalsmith(this.cwd)
 
-	metalsmith.source(config.source)
-	metalsmith.destination(config.destination)
+	metalsmith.source(source)
+	metalsmith.destination(destination)
 
 	return metalsmith
 }

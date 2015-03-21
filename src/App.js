@@ -22,7 +22,6 @@ function App(baseDir, env){
 App.DEFAULT_ENVIRONMENT = 'dev'
 
 // Dependencies can be mocked
-App.prototype.generator = new Generator
 App.prototype.server = new Server
 
 App.prototype.fs = require('fs')
@@ -50,7 +49,6 @@ App.prototype.bootstrap = function(){
 	}
 
 	return site
-
 }
 
 
@@ -61,7 +59,17 @@ App.prototype.bootstrap = function(){
  * @return {Promise} 
  */
 App.prototype.build = function(site){
-	return this.generator.build(site, site.theme, site.parser, site.plugins)
+
+	var generator = new Generator(this.getBaseDir())
+
+	return generator.build(
+		Site.Convention.content,
+		Site.Convention.destination,
+		site, 
+		site.theme, 
+		site.parser, 
+		site.plugins
+	)
 }
 
 
