@@ -1,10 +1,33 @@
 var
 Metalsmith = require('metalsmith'),
 Promise = require('node-promise').Promise,
-path = require('path')
+path = require('path'),
+Validator = require('./Validator'),
+Site = require('./Site')
 
-function Generator(cwd){
-	this.cwd = cwd
+function Generator(){}
+
+
+Generator.prototype.validator = new Validator()
+
+/**
+ * Validate cwd has required files by convention
+ * @param  {Object} convention Files thath must be available
+ * @return {Mixed}            True is dir is valid, Arra<Errors> if its invalid
+ */
+Generator.prototype.validateDir = function(dir, convention){
+	var paths = this.getRequiredPaths(dir, convention)
+
+	return this.validator.paths(paths, true)
+}
+
+
+Generator.prototype.getRequiredPaths = function(dir, convention){
+	return ['content', 'config'].reduce(function(paths, key){
+		paths[key] = path.join(dir, convention[key])
+
+		return paths
+	}, {})
 }
 
 
@@ -17,11 +40,11 @@ function Generator(cwd){
  * @param {Array} plugins Plugins registerd
  * @return {promise}      
  */
-Generator.prototype.build = function(source, destination,  site, theme, parser, plugins){
+Generator.prototype.build = function(dir, source, destination, site, theme, parser, plugins){
 
 	var 
 	promise = new Promise,
-	metal = this.forge(source, destination)
+	metal = this.forge(dir, source, destination)
 
 
 	this.bindPlugins(metal, plugins, 'beforeParser')
@@ -64,8 +87,8 @@ Generator.prototype.bindPlugins = function(metal, plugins, stage){
 }
 
 
-Generator.prototype.forge = function(source, destination){
-	var metalsmith = new Metalsmith(this.cwd)
+Generator.prototype.forge = function(dir, source, destination){
+	var metalsmith = new Metalsmith(dir)
 
 	metalsmith.source(source)
 	metalsmith.destination(destination)

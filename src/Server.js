@@ -56,7 +56,9 @@ Server.prototype.start = function(site){
 
 	var server = express()
 
-	server.use(serveStatic(site.destinationDir, {'index': ['index.html']}))
+	server.use(serveStatic(site.app.destinationDir, {'index': ['index.html']}))
+
+	// @TODO Add paths dynamically
 	server.use('/assets/', serveStatic(site.theme.assetsDir))
 
 	//@TODO Add not found
@@ -69,7 +71,7 @@ Server.prototype.start = function(site){
 Server.prototype.watch = function(app){
 
 	var 
-	pattern = path.join(app.getBaseDir(), 'content/'),
+	pattern = path.join(app.dir, 'content/'),
 
 	// Avoid initial events to be triggered
 	opts = {ignoreInitial:  true}

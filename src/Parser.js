@@ -29,7 +29,7 @@ Parser.prototype.bind = function(generator, site){
 		next()
 	})
 
-	generator.use(collections(site.config.collections))
+	generator.use(collections(site.collections))
 	generator.use(markdown())
 }
 

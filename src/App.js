@@ -4,11 +4,17 @@ Promise = require('node-promise').Promise,
 Theme = require('./Theme'),
 Parser = require('./Parser'),
 Generator = require('./Generator'),
+ConfigService = require('./ConfigService'),
 Server = require('./Server'),
 Site = require('./Site')
 
 
 function App(baseDir, env){
+
+	this.dir = baseDir || process.cwd()
+	this.env = env || App.DEFAULT_ENVIRONMENT
+	this.destinationDir = path.join(this.dir, Site.Convention.destination)
+
 	this.getBaseDir = function(){ 
 		return baseDir || process.cwd()
 	}
@@ -16,6 +22,9 @@ function App(baseDir, env){
 	this.getEnv = function(){
 		return env || App.DEFAULT_ENVIRONMENT
 	}
+
+	// Validate we are working with an estatico sites
+	this.generator.validateDir(this.dir, Site.Convention)
 }
 
 
@@ -24,9 +33,9 @@ App.DEFAULT_ENVIRONMENT = 'dev'
 // Dependencies can be mocked
 App.prototype.server = new Server
 
-App.prototype.fs = require('fs')
 App.prototype.log = console.log
-
+App.prototype.generator = new Generator()
+App.prototype.configService = new ConfigService()
 
 
 /**
@@ -34,13 +43,12 @@ App.prototype.log = console.log
  * @return {Site} A site ready to be built
  */
 App.prototype.bootstrap = function(){
+	var 
+	config  = this.configService.load(this.dir, this.env),
+	site = new Site(config, this)
 
-	var site = new Site(this.getBaseDir(), this.getEnv())
-
-	site.theme = Theme.resolve(this.getBaseDir(), site.config.theme)
-
-	site.parser = new Parser()
-
+	site.theme = Theme.resolve(this.dir, site.theme)
+	
 	//@TODO Add plugin loader
 	site.plugins = {
 		beforeParser: [],
@@ -53,21 +61,22 @@ App.prototype.bootstrap = function(){
 
 
 /**
- * Build app using middleware
+ * Load dependencias and build app using site config
  *
- * @throws {Error} If current working dir is not valid
  * @return {Promise} 
  */
 App.prototype.build = function(site){
 
-	var generator = new Generator(this.getBaseDir())
+	var parser = new Parser()
 
-	return generator.build(
+	// Build using generator
+	return this.generator.build(
+		this.dir,
 		Site.Convention.content,
 		Site.Convention.destination,
 		site, 
 		site.theme, 
-		site.parser, 
+		parser, 
 		site.plugins
 	)
 }
