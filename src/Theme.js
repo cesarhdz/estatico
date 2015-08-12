@@ -36,7 +36,7 @@ Theme.resolve = function(cwd, root){
 
 	// Validate theme
 	if(! theme.validate()){
-		this.log(theme.errors.join('n'))
+		console.log(theme.errors.join('\n'))
 		throw new Error('Theme is invalid')
 	}
 

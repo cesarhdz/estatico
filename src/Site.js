@@ -25,7 +25,7 @@ function Site(config, app){
 	this.name = this.config.name
 	this.url = this.config.url || this.getDefaultUrl()
 
-	this.theme = null
+	this.theme = config.theme
 	this.plugins = {}
 }
 
