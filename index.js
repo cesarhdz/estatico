@@ -1,3 +1,5 @@
 module.exports = {
-	App: require('./src/App')
+	// @deprecated
+	App: require('./src/App'),
+	Generator: require('./src/Generator')
 }

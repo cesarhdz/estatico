@@ -2,10 +2,19 @@ var
 path = require('path'),
 Promise = require('node-promise').Promise,
 Theme = require('./Theme'),
+Parser = require('./Parser'),
+Generator = require('./Generator'),
+ConfigService = require('./ConfigService'),
+Server = require('./Server'),
 Site = require('./Site')
 
 
 function App(baseDir, env){
+
+	this.dir = baseDir || process.cwd()
+	this.env = env || App.DEFAULT_ENVIRONMENT
+	this.destinationDir = path.join(this.dir, Site.Convention.destination)
+
 	this.getBaseDir = function(){ 
 		return baseDir || process.cwd()
 	}
@@ -13,91 +22,64 @@ function App(baseDir, env){
 	this.getEnv = function(){
 		return env || App.DEFAULT_ENVIRONMENT
 	}
+
+	// Validate we are working with an estatico sites
+	this.generator.validateDir(this.dir, Site.Convention)
 }
 
 
 App.DEFAULT_ENVIRONMENT = 'dev'
 
 // Dependencies can be mocked
-App.prototype.generatorService = new (require('./GeneratorService'))
+App.prototype.server = new Server
 
-App.prototype.fs = require('fs')
 App.prototype.log = console.log
+App.prototype.generator = new Generator()
+App.prototype.configService = new ConfigService()
 
 
 /**
- * Build app using middleware
+ * Bootstrap
+ * @return {Site} A site ready to be built
+ */
+App.prototype.bootstrap = function(){
+	var 
+	config  = this.configService.load(this.dir, this.env),
+	site = new Site(config, this)
+
+	site.theme = Theme.resolve(this.dir, site.theme)
+	
+	//@TODO Add plugin loader
+	site.plugins = {
+		beforeParser: [],
+		beforeTemplates: [],
+		afterTemplates: []
+	}
+
+	return site
+}
+
+
+/**
+ * Load dependencias and build app using site config
  *
- * @throws {Error} If current working dir is not valid
  * @return {Promise} 
  */
-App.prototype.build = function(){
+App.prototype.build = function(site){
 
-	// Bootstrap metalsmith
-	var 
-	self = this,
-	promise = new Promise(),
+	var parser = new Parser()
 
-
-	site = new Site(this.getBaseDir(), this.getEnv()),
-
-	theme = Theme.resolve(this.getBaseDir(), site.config.theme),
-
-	generator = this.generatorService.create({
-		cwd: site.dir,
-		source: Site.Convention.content,
-		destination: Site.Convention.destination
-	})
-
-
-	// Add generators
-	this.generatorService.addParser(generator, site)
-
-	// @TODO this.generatorService.addPlugins(generator, config)
-	
-	/**
-	 * Add generator to selected theme
-	 */
-	theme.bind(generator, site)
-
-	// this.generatorService.addPlugins(generator, config)
-
-	generator.build(function(err){
-	  if (err){
-	  	self.log(err.message, err.stack);
-	  	promise.reject(err)
-	  }
-
-	  else{
-	  	site.theme = theme
-	  	promise.resolve(site)
-	  }
-	})
-
-
-	return promise
+	// Build using generator
+	return this.generator.build(
+		this.dir,
+		Site.Convention.content,
+		Site.Convention.destination,
+		site, 
+		site.theme, 
+		parser, 
+		site.plugins
+	)
 }
-
-
-
-/**
- * Serve files
- */
-App.prototype.serve = function(site){
-
-	var express = require('express')
-	var serveStatic = require('serve-static')
-
-	var server = express()
-
-	server.use(serveStatic(site.destinationDir, {'index': ['index.html']}))
-	server.use('/assets/', serveStatic(site.theme.assetsDir))
-
-	//@TODO Add not found
-
-	server.listen(Site.Convention.port)
-}
-
 
 
 module.exports = App

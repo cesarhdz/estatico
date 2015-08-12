@@ -15,7 +15,7 @@ describe('App', function(){
 
 	describe('#constructor', function(){
 		
-		it('Should be constructed with a dir an environment', function(){
+		xit('Should be constructed with dir and environment', function(){
 			// when
 			app = new estatico.App()
 
@@ -39,7 +39,7 @@ describe('App', function(){
 
 	describe('#build', function(){
 
-		it('Should build source dir', function(){
+		xit('Should build source dir', function(){
 			app.build()
 		})
 
