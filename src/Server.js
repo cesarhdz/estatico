@@ -67,7 +67,13 @@ Server.prototype.start = function(site){
 }
 
 
-
+/**
+ * Watch content and reload changes
+ * It ma be more useful to embed in Gulpfile 
+ * 
+ * @param  {[type]} app [description]
+ * @return {watcher]
+ */
 Server.prototype.watch = function(app){
 
 	var 
@@ -78,10 +84,10 @@ Server.prototype.watch = function(app){
 
 	log('Watching ' + chalk.cyan(pattern) + '...')
 
-
-	watch(pattern, opts).on('change', reload(app, 'updated'))
-	watch(pattern, opts).on('add', reload(app, 'added'))
-	watch(pattern, opts).on('unlink', reload(app, 'deleted'))
+	return watch(pattern, opts)
+		.on('add', reload(app, 'added'))
+		.on('change', reload(app, 'updated'))
+		.on('unlink', reload(app, 'deleted'))
 }
 
 
