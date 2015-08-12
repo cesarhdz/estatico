@@ -115,10 +115,16 @@ Theme.prototype.isFileSupported = function(name, file){
 
 Theme.prototype.parseFile = function(name, file, site, metal){
 	var 
-	template = this.findTemplate(file),
-	model = this.buildViewModel(name, file, site, metal)
+	template = this.getTemplateName(file),
+	templatePath = this.getTemplatePath(template),
+	model = this.buildViewModel(name, file, site, metal);
 
-	return this.engine.renderFile(template, model)
+	// No template, throw a more meaningful error than fs
+	if(! templatePath){
+		throw new Error('Template [' + template  + '] for file [' + file.slug  + '] is missing.');
+	}
+
+	return this.engine.renderFile(templatePath, model)
 }
 
 Theme.prototype.buildViewModel = function(filename, file, site, metal){
@@ -133,7 +139,7 @@ Theme.prototype.buildViewModel = function(filename, file, site, metal){
 	return model
 }
 
-Theme.prototype.findTemplate = function(file){
+Theme.prototype.getTemplateName = function(file){
 	
 	var 
 	DEFAULT_TEMPLATE = 'default',
@@ -145,7 +151,22 @@ Theme.prototype.findTemplate = function(file){
 		template = path.join(collection, DEFAULT_TEMPLATE)
 	}
 
-	return path.join(this.viewsDir, template + convention.viewExtension)
+	return template;
+}
+
+
+/**
+ * Find a readable template by its name from the theme folder
+ * 
+ * @param  {String} name Tempalte name
+ * @return {String|null}      Path where template is located or null if it's not readable
+ */
+Theme.prototype.getTemplatePath = function(name){
+
+	var file =  path.join(this.viewsDir, name + convention.viewExtension);
+
+	// Return the file 
+	return (fs.existsSync(file)) ? file : null;
 }
 
 
