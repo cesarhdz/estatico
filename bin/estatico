@@ -58,7 +58,7 @@ program
 			log('Site running at ' + chalk.green(site.url))
 			log('Press Ctrl + C to stop')
 
-			app.server.watch(app)
+			app.server.watch(app, site)
 		})
 	
 	})
