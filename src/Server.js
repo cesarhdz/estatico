@@ -74,13 +74,17 @@ Server.prototype.start = function(site){
  * @param  {[type]} app [description]
  * @return {watcher]
  */
-Server.prototype.watch = function(app){
+Server.prototype.watch = function(app, site){
 
 	var 
-	pattern = path.join(app.dir, 'content/'),
+	pattern = [
+		path.join(app.dir, 'content/'),
+		site.theme.viewsDir
+	],
 
 	// Avoid initial events to be triggered
-	opts = {ignoreInitial:  true}
+	opts = {ignoreInitial:  true};
+
 
 	log('Watching ' + chalk.cyan(pattern) + '...')
 
