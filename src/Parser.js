@@ -1,7 +1,7 @@
 var
 markdown = require('metalsmith-markdown'),
 collections = require('metalsmith-collections'),
-
+drafts = require('metalsmith-drafts'),
 
 Reference = require('./Reference'),
 reference = new Reference()
@@ -29,7 +29,11 @@ Parser.prototype.bind = function(generator, site){
 		next()
 	})
 
+	/**
+	 * Default plugins are hardcoded because are part of estatico design
+	 */
 	generator.use(collections(site.config.collections))
+	generator.use(drafts())
 	generator.use(markdown())
 }
 
