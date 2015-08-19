@@ -106,9 +106,21 @@ Theme.prototype.bind = function(generator, site){
 }
 
 
+var supportedExt = ['.md', '.txt', '.html'];
 
+/**
+ * If File supported
+ *
+ * Only suported files are converted to html
+ * @param  {String}  name Filename
+ * @param  {String}  file File
+ * @return {Boolean}      Only text files wtih markdown are supported
+ */
 Theme.prototype.isFileSupported = function(name, file){
-	return true
+
+	var ext = path.extname(name);
+
+	return supportedExt.indexOf(ext) != -1;
 }
 
 
