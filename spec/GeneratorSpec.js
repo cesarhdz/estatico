@@ -15,22 +15,22 @@ describe('Generator', function(){
 
 	describe('#constructor', function(){
 		
-		it('Should be constructed with a dir and environment', function(){
-			// when
-			gen = new estatico.Generator()
+		// it('Should be constructed with a dir and environment', function(){
+		// 	// when
+		// 	gen = new estatico.Generator()
 
-			//then
-			gen.getBaseDir().should.equal(process.cwd())
-			gen.getEnv().should.equal('dev')
+		// 	//then
+		// 	gen.getBaseDir().should.equal(process.cwd())
+		// 	gen.getEnv().should.equal('dev')
 
 
-			/// when
-			gen = new estatico.Generator('/custom/dir', 'prod')
+		// 	/// when
+		// 	gen = new estatico.Generator('/custom/dir', 'prod')
 
-			//then
-			gen.getBaseDir().should.equal('/custom/dir')
-			gen.getEnv().should.equal('prod')
-		})
+		// 	//then
+		// 	gen.getBaseDir().should.equal('/custom/dir')
+		// 	gen.getEnv().should.equal('prod')
+		// })
 
 
 	})

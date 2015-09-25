@@ -23,7 +23,9 @@ function Site(config, app){
 
 	// Common vars
 	this.name = this.config.name
-	this.url = this.config.url || this.getDefaultUrl()
+
+	//@deprecated Use app.url
+	this.url = app.url
 
 	this.theme = config.theme
 	this.plugins = {}
@@ -39,9 +41,6 @@ Site.Convention = {
 
 Site.prototype.validator = new Validator()
 
-Site.prototype.getDefaultUrl = function(){
-	return 'http://localhost:' + Site.Convention.port
-}
 
 
 module.exports = Site
