@@ -15,9 +15,9 @@ version = require('../package.json').version
  */
 function newApp(env){
 
-	var app = new estatico.App(process.cwd(), env)
+	var app = new estatico.App({env:env})
 
-	log('Starting app in ' + process.cwd())
+	log('Starting app in ' + app.dir)
 
 	return app
 }
@@ -36,7 +36,7 @@ function build(app){
 	promise = app.build(site)
 
 	promise.then(function(){
-		log('Site successfully built to ' + chalk.green(site.destinationDir))
+		log('Site successfully built to ' + chalk.green(site.app.destinationDir))
 	})
 
 	return promise
@@ -69,8 +69,10 @@ program
 program
 	.command('build [env]')
 	.description('Build application')
+
 	.action(function(env, opts){
 
+		//@TODO Add configurable options
 		var app = newApp(env)
 
 		build(app)
