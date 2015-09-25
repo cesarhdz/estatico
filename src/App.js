@@ -20,6 +20,7 @@ function App(config){
 	this.dir = config.baseDir || process.cwd();
 	this.env = config.env || App.DEFAULT_ENVIRONMENT;
 	this.destinationDir = path.join(this.dir, config.targetDir || Site.Convention.destination);
+	this.url = config.url || this.getDefaultUrl()
 
 	this.getBaseDir = function(){ 
 		return this.dir;
@@ -29,12 +30,18 @@ function App(config){
 		return this.env;
 	}
 
+	//@TODO Move generator to own method
 	// Validate we are working with an estatico sites
 	this.generator.validateDir(this.dir, Site.Convention)
 }
 
 
 App.DEFAULT_ENVIRONMENT = 'dev'
+
+
+App.prototype.getDefaultUrl = function(){
+	return 'http://localhost:' + Site.Convention.port + '/';
+}
 
 // Dependencies can be mocked
 App.prototype.server = new Server

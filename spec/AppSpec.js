@@ -36,6 +36,27 @@ describe('App', function(){
 			app.env.should.equal('prod')
 		})
 
+
+		it('Should now the URL by default', function(){
+
+			//expect
+			new estatico.App().url.should.equal('http://localhost:3000/')
+
+		})
+
+
+		it('Should be able to use a custom URL', function(){
+			//given
+			var customUrl = 'http://estatico.com/'
+
+			//when
+			app = new estatico.App({url: customUrl})
+
+			//then
+			app.url.should.equal(customUrl)
+
+		})
+
 		afterEach(function(){
 			estatico.App.prototype.generator = generator;
 		})
