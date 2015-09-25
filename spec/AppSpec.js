@@ -8,28 +8,36 @@ describe('App', function(){
 
 	var app
 
-	beforeEach(function(){
-		app = new estatico.App()
-	})
-
-
 	describe('#constructor', function(){
+
+		var generator = estatico.App.prototype.generator;
+
+		beforeEach(function(){
+			estatico.App.prototype.generator = {validateDir: function(){}}
+		})
 		
-		xit('Should be constructed with dir and environment', function(){
+		it('Should be constructed with dir, environment and dir with default values', function(){
 			// when
 			app = new estatico.App()
 
 			//then
-			app.getBaseDir().should.equal(process.cwd())
-			app.getEnv().should.equal('dev')
+			app.dir.should.equal(process.cwd())
+			app.env.should.equal('dev')
+			app.destinationDir.should.equal(process.cwd() + '/target/work');
 
+		})
 
-			/// when
-			app = new estatico.App('/custom/dir', 'prod')
+		it('Should be constructed with dir, environment and dir with custom values', function(){
+			// when
+			app = new estatico.App({baseDir: '/custom/dir', env: 'prod'})
 
 			//then
-			app.getBaseDir().should.equal('/custom/dir')
-			app.getEnv().should.equal('prod')
+			app.dir.should.equal('/custom/dir')
+			app.env.should.equal('prod')
+		})
+
+		afterEach(function(){
+			estatico.App.prototype.generator = generator;
 		})
 
 
