@@ -17,7 +17,6 @@ function reload(app, event){
 		pattern = path.join(app.getBaseDir(), 'content/'),
 		rel = path.relative(pattern, file)
 
-		console.log('\n')
 		log('File [' + chalk.cyan(rel) + '] ' + event +'.' )
 		
 		build(app)
@@ -63,7 +62,7 @@ Server.prototype.start = function(site){
 
 	//@TODO Add not found
 
-	server.listen(Site.Convention.port)
+	return server.listen(Site.Convention.port);
 }
 
 
