@@ -15,8 +15,6 @@ function Theme(dir){
 	this.baseDir = dir
 	this.viewsDir = path.join(dir, convention.views)
 	this.assetsDir = path.join(dir, convention.assets)
-
-	this.locals = []
 }
 
 
@@ -77,22 +75,24 @@ Theme.prototype.validate = function(){
 
 /**
  * Add theme to generator
+ * Using metalsmith api register a closure to parse files
+ * 
  * @param  {Metalsmith} generator Current generator
+ * @param {Site} site Site object
+ * @param {Object<String, Function} helpers Map of helpers to be added to parser engine
  * @return {void}           
  */
-Theme.prototype.bind = function(generator, site){
+Theme.prototype.bind = function(generator, site, helpers){
 
 
 	var self = this
-
-	this.locals = this.loadHelpers(site)
 
 	generator.use(function(files, metal, next){
 		// Only html files will be parsed
 		Object.keys(files).forEach(function(k){
 			// If its supported, then its parsed
 			if(self.isFileSupported(k, files[k])){
-				files[k].contents = new Buffer(self.parseFile(k, files[k], site, metal))
+				files[k].contents = new Buffer(self.parseFile(k, files[k], site, metal, helpers))
 			}
 		})
 
@@ -124,8 +124,20 @@ Theme.prototype.isFileSupported = function(name, file){
 }
 
 
-
-Theme.prototype.parseFile = function(name, file, site, metal){
+/**
+ * ParseFile
+ * Method used to parse every supported file, it's usually a markdown file with
+ * a jade template
+ * 
+ * @param  {String} 			name    Name of the file
+ * @param  {String} 			file    Path of the file
+ * @param  {Site} 				site    Instance of current site
+ * @param  {Metalsmith} 		metal   Metalsmith generator
+ * @param  {Object<String, fn>}	helpers Map of helpers to be added to template engine context
+ * @return {String}         			File rendered
+ * @throws {Error} If template for a fil doesn't exists
+ */	
+Theme.prototype.parseFile = function(name, file, site, metal, helpers){
 	var 
 	template = this.getTemplateName(file),
 	templatePath = this.getTemplatePath(template),
@@ -186,13 +198,9 @@ Theme.prototype.getTemplatePath = function(name){
  * Load helpers
  * @param  {[type]} site [description]
  * @return {[type]}      [description]
+ * @deprecated  locals must be added by site or app
  */
 Theme.prototype.loadHelpers = function(site){
-
-	var helpers = {
-		permalink: '../helpers/permalink'
-	}
-
 	return Object.keys(helpers).reduce(function(map, key){
 
 		map[key] = require(helpers[key])(site)

@@ -30,5 +30,11 @@
     "node-promise": "^0.5.12",
     "serve-static": "^1.9.1",
     "url-join": "0.0.1"
-  }
+  },
+  "readme": "ERROR: No README data found!",
+  "_id": "estatico@0.1.0",
+  "_shasum": "bf96930d43e440b0403ad6cf2402884388762073",
+  "_resolved": "git://github.com/cesarhdz/estatico#44df0e9ccfaf445ed8b67984a1b1b9eba66e1fa9",
+  "_from": "git://github.com/cesarhdz/estatico#44df0e9",
+  "_fromGithub": true
 }

@@ -34,13 +34,15 @@ Generator.prototype.getRequiredPaths = function(dir, convention){
 /**
  * Reads contents of site and applies parser and plugins
  * finally files are saved in site destinatino dir
- * @param  {Site} site site
- * @param {Theme} theme Theme used to build the site
- * @param {Parser} parser Parser used to read files
- * @param {Array} plugins Plugins registerd
+ * 
+ * @param  {Site} 				site site
+ * @param {Theme} 				theme Theme used to build the site
+ * @param {Parser} 				parser Parser used to read files
+ * @param {Array} 				plugins Plugins registerd
+ * @param {Object<String, fn>} helpers Helpers that will be added to template engine
  * @return {promise}      
  */
-Generator.prototype.build = function(dir, source, destination, site, theme, parser, plugins){
+Generator.prototype.build = function(dir, source, destination, site, theme, parser, plugins, helpers){
 
 	var 
 	promise = new Promise,
@@ -58,7 +60,7 @@ Generator.prototype.build = function(dir, source, destination, site, theme, pars
 	/**
 	 * Add generator to selected theme
 	 */
-	theme.bind(metal, site)
+	theme.bind(metal, site, helpers)
 
 
 	this.bindPlugins(metal, plugins, 'afterTemplates')

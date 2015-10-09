@@ -69,6 +69,9 @@ App.prototype.bootstrap = function(){
 		afterTemplates: []
 	}
 
+	//@TODo Add helpers
+	site.addHelpers({})
+
 	return site
 }
 
@@ -90,7 +93,8 @@ App.prototype.build = function(site){
 		site, 
 		site.theme, 
 		parser, 
-		site.plugins
+		site.plugins,
+		site.helpers
 	)
 }
 
