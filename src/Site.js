@@ -43,13 +43,14 @@ Site.Convention = {
  * Funtion to add template engine helpers to site
  * @param {Object<String, fn} helpers 
  * @return {Object<String, fn} helpers with a reference to the site
+ *                             all funtions are curried with site info
  */
 Site.prototype.addHelpers = function(helpers){
 
 	var site = this;
 
 	this.helpers = Object.keys(helpers).reduce(function(acc, key){
-		acc[key] = helpers[key](site)
+		acc[key] = helpers[key](site);
 
 		return acc;
 	}, {})

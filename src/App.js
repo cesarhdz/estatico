@@ -55,7 +55,7 @@ App.prototype.configService = new ConfigService()
  * Bootstrap
  * @return {Site} A site ready to be built
  */
-App.prototype.bootstrap = function(){
+App.prototype.bootstrap = function(helpers){
 	var 
 	config  = this.configService.load(this.dir, this.env),
 	site = new Site(config, this)
@@ -69,8 +69,7 @@ App.prototype.bootstrap = function(){
 		afterTemplates: []
 	}
 
-	//@TODo Add helpers
-	site.addHelpers({})
+	site.addHelpers(helpers)
 
 	return site
 }

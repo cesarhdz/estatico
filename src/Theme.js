@@ -141,7 +141,7 @@ Theme.prototype.parseFile = function(name, file, site, metal, helpers){
 	var 
 	template = this.getTemplateName(file),
 	templatePath = this.getTemplatePath(template),
-	model = this.buildViewModel(name, file, site, metal);
+	model = this.buildViewModel(name, file, site, metal, helpers);
 
 	// No template, throw a more meaningful error than fs
 	if(! templatePath){
@@ -151,9 +151,9 @@ Theme.prototype.parseFile = function(name, file, site, metal, helpers){
 	return this.engine.renderFile(templatePath, model)
 }
 
-Theme.prototype.buildViewModel = function(filename, file, site, metal){
+Theme.prototype.buildViewModel = function(filename, file, site, metal, helpers){
 
-	var model = extend({}, this.locals)
+	var model = extend({}, helpers)
 
 	model.filename = filename
 	model.page = file
